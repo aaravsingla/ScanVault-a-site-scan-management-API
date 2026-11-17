@@ -6,7 +6,7 @@ Everything you need to explain this project in an interview, in plain language. 
 
 ## 1. The 30-second pitch
 
-> "ScanVault is a small reality-capture data platform. Teams create sites, upload 3D scans or photos of them over time, view them in a browser 3D viewer, and pin notes at exact positions on the model. The backend is an ASP.NET Core Web API in C# with a layered design: controllers, services and repositories. Data lives in Azure SQL through Entity Framework Core, scan files live in Azure Blob Storage, and the React front end is served by the same Azure App Service. It has 24 xUnit tests and a GitHub Actions pipeline that builds, tests and deploys on every push."
+> "ScanVault is a small reality-capture data platform. Teams create sites, upload 3D scans or photos of them over time, view them in a browser 3D viewer, and pin notes at exact positions on the model. The backend is an ASP.NET Core Web API in C# with a layered design: controllers, services and repositories. Data lives in Azure SQL through Entity Framework Core, scan files live in Azure Blob Storage, and the React front end is served by the same Azure App Service. It has 25 xUnit tests and a GitHub Actions pipeline that builds, tests and deploys on every push."
 
 Why this project for Hexagon: their Aura Reality platform manages reality-capture data (scans, point clouds, digital twins) in the cloud. ScanVault is a small version of that idea, built to learn the domain and the .NET/Azure stack.
 
@@ -163,7 +163,7 @@ Site 1 ──── * Scan 1 ──── * Annotation
 - **Integration tests** (`tests/…/Api/ApiTests.cs`) use `WebApplicationFactory` to start the whole API in memory and send real HTTP requests: create → upload → annotate → download, plus 400 and 404 cases.
 - Pattern: **Arrange, Act, Assert**. `[Fact]` = one test; `[Theory]` + `[InlineData]` = the same test with several inputs.
 
-Run: `dotnet test` → 24 passing.
+Run: `dotnet test` → 25 passing.
 
 ---
 
@@ -229,7 +229,7 @@ Add authentication with Microsoft Entra ID (JWT bearer tokens) and per-site perm
 
 ```bash
 dotnet build                                   # compile
-dotnet test                                    # run the 24 tests
+dotnet test                                    # run the 25 tests
 dotnet run --project src/ScanVault.Api --launch-profile http   # run on http://localhost:5297
 dotnet ef migrations add <Name> --project src/ScanVault.Api    # new migration after model changes
 cd frontend && npm run dev                     # React dev server with hot reload

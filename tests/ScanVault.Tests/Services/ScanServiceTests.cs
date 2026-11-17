@@ -103,6 +103,20 @@ public class ScanServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task Dates_ReadBackFromDatabase_AreMarkedUtc()
+    {
+        var siteId = await CreateSiteAsync();
+        var uploaded = await CreateService().UploadAsync(siteId,
+            TestFiles.Glb("Dated", new DateTime(2026, 11, 16, 10, 0, 0, DateTimeKind.Utc)));
+
+        var reloaded = await CreateService().GetAsync(uploaded.Id);
+
+        Assert.Equal(DateTimeKind.Utc, reloaded.CapturedAt.Kind);
+        Assert.Equal(DateTimeKind.Utc, reloaded.CreatedAt.Kind);
+        Assert.Equal(new DateTime(2026, 11, 16, 10, 0, 0, DateTimeKind.Utc), reloaded.CapturedAt);
+    }
+
+    [Fact]
     public async Task OpenFile_ReturnsTheUploadedBytes()
     {
         var siteId = await CreateSiteAsync();

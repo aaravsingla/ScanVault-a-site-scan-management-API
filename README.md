@@ -15,7 +15,7 @@ Built with **C# / ASP.NET Core Web API**, **Entity Framework Core + SQL**, **Rea
 - **Scan history** per site, newest first, so progress can be compared over time
 - **3D viewer** in React (rotate, zoom) with **location-pinned annotations**: click the model to drop a pin at that X/Y/Z point
 - Input validation, consistent JSON errors (ProblemDetails), and a `/health` endpoint
-- **24 automated tests**: service-layer unit tests and full HTTP API tests
+- **25 automated tests**: service-layer unit tests and full HTTP API tests
 
 ## Architecture
 

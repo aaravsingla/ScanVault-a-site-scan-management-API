@@ -54,5 +54,15 @@ public class ScanVaultDbContext : DbContext
             annotation.Property(a => a.Text).HasMaxLength(500).IsRequired();
             annotation.Property(a => a.Category).HasConversion<string>().HasMaxLength(20);
         });
+
+        // All times are stored in UTC, but SQL Server returns them without a time zone.
+        // Marking them as UTC on the way out makes the JSON end in "Z", so browsers convert correctly.
+        var utcConverter = new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime, DateTime>(
+            toDb => toDb.ToUniversalTime(),
+            fromDb => DateTime.SpecifyKind(fromDb, DateTimeKind.Utc));
+
+        foreach (var entity in modelBuilder.Model.GetEntityTypes())
+            foreach (var property in entity.GetProperties().Where(p => p.ClrType == typeof(DateTime)))
+                property.SetValueConverter(utcConverter);
     }
 }
