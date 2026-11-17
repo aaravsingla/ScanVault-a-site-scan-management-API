@@ -9,9 +9,9 @@
 # Usage:  bash infra/azure-setup.sh
 set -euo pipefail
 
-LOCATION="${LOCATION:-centralindia}"
+LOCATION="${LOCATION:-eastasia}"
 RESOURCE_GROUP="${RESOURCE_GROUP:-scanvault-rg}"
-SUFFIX="${SUFFIX:-$(LC_ALL=C tr -dc 'a-z0-9' </dev/urandom | head -c 6)}"
+SUFFIX="${SUFFIX:-$(openssl rand -hex 3)}"
 
 APP_NAME="scanvault-${SUFFIX}"
 PLAN_NAME="scanvault-plan"
@@ -19,7 +19,7 @@ STORAGE_ACCOUNT="scanvault${SUFFIX}"
 SQL_SERVER="scanvault-sql-${SUFFIX}"
 SQL_DB="scanvault"
 SQL_ADMIN="scanvaultadmin"
-SQL_PASSWORD="${SQL_PASSWORD:-Sv$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 20)!9}"
+SQL_PASSWORD="${SQL_PASSWORD:-Sv$(openssl rand -hex 10)Aa!9}"
 
 echo "==> Resource group ${RESOURCE_GROUP} in ${LOCATION}"
 az group create --name "$RESOURCE_GROUP" --location "$LOCATION" --output none
@@ -40,7 +40,8 @@ az sql server firewall-rule create --resource-group "$RESOURCE_GROUP" --server "
   --name AllowAzureServices --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0 --output none
 az sql db create --resource-group "$RESOURCE_GROUP" --server "$SQL_SERVER" --name "$SQL_DB" \
   --edition GeneralPurpose --family Gen5 --capacity 2 --compute-model Serverless \
-  --use-free-limit --free-limit-exhaustion-behavior AutoPause --output none
+  --use-free-limit --free-limit-exhaustion-behavior AutoPause \
+  --backup-storage-redundancy Local --output none
 SQL_CONNECTION="Server=tcp:${SQL_SERVER}.database.windows.net,1433;Database=${SQL_DB};User ID=${SQL_ADMIN};Password=${SQL_PASSWORD};Encrypt=True;TrustServerCertificate=False;Connection Timeout=60;"
 
 echo "==> App Service ${APP_NAME} (Linux, F1 free)"
