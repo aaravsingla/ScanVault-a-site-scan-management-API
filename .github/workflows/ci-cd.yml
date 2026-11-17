@@ -1,0 +1,68 @@
+name: CI/CD
+
+# Runs on every push and pull request: builds the React app, builds and tests the API,
+# then (on main, once Azure is configured) deploys the result to Azure App Service.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build React front end (outputs into the API's wwwroot)
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Test (xUnit)
+        run: dotnet test --no-restore --verbosity normal
+
+      - name: Publish API + front end
+        run: dotnet publish src/ScanVault.Api -c Release -o publish --no-restore
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scanvault
+          path: publish
+
+  deploy:
+    # Only deploys from main, and only after the AZURE_WEBAPP_NAME repository variable is set
+    # (infra/azure-setup.sh sets it together with the publish-profile secret).
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' && vars.AZURE_WEBAPP_NAME != ''
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.webapp-url }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: scanvault
+          path: publish
+
+      - name: Deploy to Azure App Service
+        id: deploy
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: publish
