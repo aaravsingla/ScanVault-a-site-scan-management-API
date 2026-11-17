@@ -1,7 +1,7 @@
 # ScanVault – Site-Scan Management Platform
 
-
 **Live demo:** https://scanvault-b88671.azurewebsites.net · **API docs:** https://scanvault-b88671.azurewebsites.net/swagger
+
 ScanVault is a small cloud platform for **reality-capture data**: teams create *sites* (a building floor, a construction site), upload *scans* of them over time (3D models or photos), view them in the browser, and pin *annotations* at exact 3D positions ("crack near this window", "partition half built").
 
 Built with **C# / ASP.NET Core Web API**, **Entity Framework Core + SQL**, **React**, and **Azure** (App Service, Azure SQL, Blob Storage), with **xUnit** tests and a **GitHub Actions** CI/CD pipeline.
